@@ -58,10 +58,9 @@ sudo chroot $R ./setFstab.sh
 echo SETUP HOST
 sudo chroot $R ./setHost.sh
 
-echo CREATE HYBRIS USER
-sudo chroot $R adduser --gecos "RPiBbuntu user" --add_extra_groups --disabled-password hybris
-sudo chroot $R usermod -a -G sudo,adm -p '$6$iTPEdlv4$HSmYhiw2FmvQfueq32X30NqsYKpGDoTAUV2mzmHEgP/1B7rV3vfsjZKnAWn6M2d.V2UsPuZ2nWHg1iqzIu/nF/' hybris
-sudo chroot $R bin/bash -c 'echo "hybris:hybris" | chpasswd'
+echo CREATE UBUNTU USER
+sudo chroot $R adduser --gecos "RPiBbuntu user" --add_extra_groups --disabled-password ubuntu
+sudo chroot $R usermod -a -G sudo,adm -p '$6$iTPEdlv4$HSmYhiw2FmvQfueq32X30NqsYKpGDoTAUV2mzmHEgP/1B7rV3vfsjZKnAWn6M2d.V2UsPuZ2nWHg1iqzIu/nF/' ubuntu
 
 echo SYSTEM CLEANUP
 sudo chroot $R apt-get autoclean
