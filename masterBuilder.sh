@@ -89,7 +89,15 @@ sudo chroot $R umount -l sys
 
 echo CLEANUP FILES
 sudo chroot $R ./cleanUp.sh
-sudo .$R/isMouned.sh
+
+DIRECTORY=`pwd`
+MOUNTS=`mount | grep ${DIRECTORY}`
+if [ -z "$MOUNTS" ]; then
+    echo "Nothing to unmount"
+else
+  sudo umount -l ${DIRECTORY}
+fi
+
 sudo chroot $R ./cleanUp.sh
 
 echo BUILD BASE IMAGE 1.75GiB
