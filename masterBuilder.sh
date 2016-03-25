@@ -8,10 +8,12 @@ export TZ='Europe/Warsaw'
 R=${BUILDDIR}/chroot
 mkdir -p $R
 mv *.sh $R
+
 RELEASE=$1
+REPOSITORY=$2
 
 echo BASE DEBOOTSTRAP
-sudo qemu-debootstrap --arch armhf $RELEASE $R http://ports.ubuntu.com/
+sudo qemu-debootstrap --arch armhf $RELEASE $R $REPOSITORY
 
 echo COPY QEMU_USER_STATIC
 sudo cp /usr/bin/qemu-arm-static $R/bin/
@@ -21,7 +23,7 @@ sudo mount -o rw,exec,users -t proc none $R/proc
 sudo mount -o rw,exec,users -t sysfs mone $R/sys
 
 echo SET SOURCES
-sudo chroot $R ./setSources.sh $RELEASE
+sudo chroot $R ./setSources.sh $RELEASE $REPOSITORY
 
 echo TRICK DUMMY SYSTEM TO UPGRADE
 sudo chroot $R apt-get update
