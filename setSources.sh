@@ -8,8 +8,8 @@ deb ${REPOSITORY} ${RELEASE} main contrib non-free
 deb ${REPOSITORY} ${RELEASE}-updates main contrib non-free
 # deb-src ${REPOSITORY} ${RELEASE}-updates main contrib non-free
 
-deb ${REPOSITORY} ${RELEASE}-security main contrib non-free
-# deb-src ${REPOSITORY} ${RELEASE}-security main contrib non-free
+deb ${REPOSITORY} ${RELEASE}-proposed-updates main contrib non-free
+# deb-src ${REPOSITORY} ${RELEASE}-proposed-updates main contrib non-free
 
 deb ${REPOSITORY} ${RELEASE}-backports main contrib non-free
 # deb-src ${REPOSITORY} ${RELEASE}-backports main contrib non-free
