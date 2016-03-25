@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-echo rpibuntu > etc/hostname
+echo debianrpi > etc/hostname
 
 cat <<EOF > etc/hosts
 127.0.0.1       localhost
@@ -8,5 +8,5 @@ cat <<EOF > etc/hosts
 ff02::1         ip6-allnodes
 ff02::2         ip6-allrouters
 
-127.0.1.1       rpibuntu
+127.0.1.1       debianrpi
 EOF

@@ -32,13 +32,13 @@ sudo chroot $R apt-get -fuy -o Dpkg::Options::="--force-confdef" -o Dpkg::Option
 echo INSTALL RPi PPA
 sudo chroot $R ./setPPA.sh
 
-sudo chroot $R apt-get -y install software-properties-common ubuntu-keyring
+sudo chroot $R apt-get -y install software-properties-common
 sudo chroot $R apt-add-repository -y ppa:fo0bar/rpi2
 sudo chroot $R apt-get update
 
 echo INSTALL STANDARD PACKAGES 
 sudo chroot $R apt-get -fuy -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --force-yes \
-	install ubuntu-minimal apt-utils ubuntu-standard initramfs-tools raspberrypi-bootloader-nokernel \
+	install apt-utils initramfs-tools raspberrypi-bootloader-nokernel \
     rpi2-ubuntu-errata language-pack-en openssh-server language-pack-pl
 
 #echo  INSTALL MINIMALL DESKTOP
@@ -61,7 +61,7 @@ echo SETUP HOST
 sudo chroot $R ./setHost.sh
 
 echo CREATE UBUNTU USER
-sudo chroot $R adduser --gecos "RPiBbuntu user" --add_extra_groups --disabled-password ubuntu
+sudo chroot $R adduser --gecos "DebianRPI user" --add_extra_groups --disabled-password ubuntu
 sudo chroot $R usermod -a -G sudo,adm -p '$6$iTPEdlv4$HSmYhiw2FmvQfueq32X30NqsYKpGDoTAUV2mzmHEgP/1B7rV3vfsjZKnAWn6M2d.V2UsPuZ2nWHg1iqzIu/nF/' ubuntu
 
 echo SYSTEM CLEANUP
