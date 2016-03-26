@@ -76,12 +76,11 @@ echo CREATE UBUNTU USER
 sudo chroot $R adduser --gecos "RPiBbuntu user" --add_extra_groups --disabled-password ubuntu
 sudo chroot $R usermod -a -G sudo,adm -p '$6$iTPEdlv4$HSmYhiw2FmvQfueq32X30NqsYKpGDoTAUV2mzmHEgP/1B7rV3vfsjZKnAWn6M2d.V2UsPuZ2nWHg1iqzIu/nF/' ubuntu
 
-echo SYSTEM CLEANUP
-sudo chroot $R apt-get autoclean
-sudo chroot $R apt-get -y autoremove
-
 echo SETUP INTERFACES
 sudo chroot $R ./setInterfaces.sh
+
+echo SETUP FIRMWARE CONFIG FOR THE PI
+sudo chroot $R ./setFirmware.sh
 
 echo ENABLE SOUND ON BOOT
 sudo chroot $R ./setSound.sh
@@ -89,12 +88,13 @@ sudo chroot $R ./setSound.sh
 echo DISABLE MODUES NOT APPLICABLE ON THE PI2
 sudo chroot $R ./setBlacklist.sh
 
-echo SETUP FIRMWARE CONFIG FOR THE PI
-sudo chroot $R ./setFirmware.sh
-
 sudo ln -sf firmware/config.txt $R/boot/config.txt
 sudo ln -sf firmware/cmdline.txt $R/boot/cmdline.txt
 sudo  chroot $R fake-hwclock save
+
+echo SYSTEM CLEANUP
+sudo chroot $R apt-get autoclean
+sudo chroot $R apt-get -y autoremove
 
 echo UNMOUNT FILESYSTEMS
 sudo chroot $R umount -l proc
