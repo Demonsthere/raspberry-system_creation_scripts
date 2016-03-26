@@ -32,12 +32,18 @@ sudo chroot $R ./setPPA.sh
 
 sudo chroot $R apt-get -y install software-properties-common ubuntu-keyring
 sudo chroot $R apt-add-repository -y ppa:fo0bar/rpi2
+sudo chroot $R apt-add-repository -y ppa:ubuntu-pi-flavour-makers/ppa
 sudo chroot $R apt-get update
 
 echo INSTALL STANDARD PACKAGES 
 sudo chroot $R apt-get -fuy -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --force-yes \
-	install ubuntu-minimal apt-utils ubuntu-standard initramfs-tools raspberrypi-bootloader-nokernel \
+	install ubuntu-minimal apt-utils initramfs-tools raspberrypi-bootloader-nokernel \
     rpi2-ubuntu-errata language-pack-en openssh-server language-pack-pl
+
+sudo chroot $R apt-get -y install libraspberrypi-bin libraspberrypi-dev \
+    libraspberrypi-doc libraspberrypi0 raspberrypi-bootloader rpi-update
+sudo chroot $R apt-get -y install linux-firmware linux-firmware-nonfree
+sudo chroot $R rpi-update
 
 #echo  INSTALL MINIMALL DESKTOP
 #sudo chroot $R apt-get install -fuy --no-install-recommends lubuntu-core
