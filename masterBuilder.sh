@@ -23,6 +23,13 @@ sudo mount -o rw,exec,users -t sysfs mone $R/sys
 echo SET SOURCES
 sudo chroot $R ./setSources.sh $RELEASE
 
+echo SET LOCALES
+for LOCALE in $(sudo chroot $R locale | cut -d'=' -f2 | grep -v : | sed 's/"//g' | uniq); do
+  if [ -n "${LOCALE}" ]; then
+    sudo chroot $R locale-gen $LOCALE
+  fi
+done
+
 echo TRICK DUMMY SYSTEM TO UPGRADE
 sudo chroot $R apt-get update
 sudo chroot $R apt-get -fuy -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --force-yes dist-upgrade
@@ -37,11 +44,11 @@ sudo chroot $R apt-get update
 
 echo INSTALL STANDARD PACKAGES 
 sudo chroot $R apt-get -fuy -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --force-yes \
-	install ubuntu-minimal apt-utils initramfs-tools raspberrypi-bootloader-nokernel \
-    rpi2-ubuntu-errata language-pack-en openssh-server language-pack-pl
+install ubuntu-minimal apt-utils initramfs-tools raspberrypi-bootloader-nokernel \
+rpi2-ubuntu-errata language-pack-en openssh-server language-pack-pl
 
 sudo chroot $R apt-get -y install libraspberrypi-bin libraspberrypi-dev \
-    libraspberrypi-doc libraspberrypi0 raspberrypi-bootloader rpi-update
+libraspberrypi-doc libraspberrypi0 raspberrypi-bootloader rpi-update
 sudo chroot $R apt-get -y install linux-firmware linux-firmware-nonfree
 sudo chroot $R rpi-update
 
