@@ -55,8 +55,7 @@ sudo chroot $R apt-get -y install libraspberrypi-bin libraspberrypi-dev \
 libraspberrypi-doc libraspberrypi0 raspberrypi-bootloader rpi-update
 sudo chroot $R rpi-update
 sudo chroot $R apt-get -y install linux-firmware linux-firmware-nonfree
-sudo chroot $R apt-get -y --no-install-recommends install linux-image-rpi2
-sudo chroot $R apt-get -y install flash-kernel
+
 VMLINUZ="$(ls -1 $R/boot/vmlinuz-* | sort | tail -n 1)"
 [ -z "$VMLINUZ" ] && exit 1
 sudo cp $VMLINUZ $R/boot/firmware/kernel7.img
