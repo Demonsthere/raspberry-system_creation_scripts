@@ -38,24 +38,23 @@ echo INSTALL RPi PPA
 sudo chroot $R ./setPPA.sh
 
 sudo chroot $R apt-get -y install software-properties-common ubuntu-keyring
-#sudo chroot $R apt-add-repository -y ppa:fo0bar/rpi2
+#sudo chroot $R apt-add-repository -y ppa:fo0bar/rpi2 raspberrypi-bootloader-nokernel rpi2-ubuntu-errata
 sudo chroot $R apt-add-repository -y ppa:ubuntu-pi-flavour-makers/ppa
 sudo chroot $R apt-get update
 
 echo INSTALL STANDARD PACKAGES 
 sudo chroot $R apt-get -fuy -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --force-yes \
-install ubuntu-minimal apt-utils initramfs-tools raspberrypi-bootloader-nokernel \
-rpi2-ubuntu-errata language-pack-en openssh-server language-pack-pl
-
-sudo chroot $R apt-get -y install libraspberrypi-bin libraspberrypi-dev \
-libraspberrypi-doc libraspberrypi0 raspberrypi-bootloader rpi-update
-sudo chroot $R apt-get -y install linux-firmware linux-firmware-nonfree
-sudo chroot $R rpi-update
+install f2fs-tools software-properties-common ubuntu-standard apt-utils initramfs-tools \
+language-pack-en openssh-server language-pack-pl
 
 #echo  INSTALL MINIMALL DESKTOP
 #sudo chroot $R apt-get install -fuy --no-install-recommends lubuntu-core
 
 echo INSTALL KERNEL. Use flash-kernel tp avoid fail platform detection
+sudo chroot $R rpi-update
+sudo chroot $R apt-get -y install libraspberrypi-bin libraspberrypi-dev \
+libraspberrypi-doc libraspberrypi0 raspberrypi-bootloader rpi-update
+sudo chroot $R apt-get -y install linux-firmware linux-firmware-nonfree
 sudo chroot $R apt-get -y --no-install-recommends install linux-image-rpi2
 sudo chroot $R apt-get -y install flash-kernel
 VMLINUZ="$(ls -1 $R/boot/vmlinuz-* | sort | tail -n 1)"
