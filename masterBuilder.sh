@@ -38,7 +38,7 @@ echo INSTALL RPi PPA
 sudo chroot $R ./setPPA.sh
 
 sudo chroot $R apt-get -y install software-properties-common ubuntu-keyring
-sudo chroot $R apt-add-repository -y ppa:fo0bar/rpi2
+#sudo chroot $R apt-add-repository -y ppa:fo0bar/rpi2
 sudo chroot $R apt-add-repository -y ppa:ubuntu-pi-flavour-makers/ppa
 sudo chroot $R apt-get update
 
