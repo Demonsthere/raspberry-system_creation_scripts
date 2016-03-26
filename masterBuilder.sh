@@ -51,9 +51,9 @@ language-pack-en openssh-server language-pack-pl
 #sudo chroot $R apt-get install -fuy --no-install-recommends lubuntu-core
 
 echo INSTALL KERNEL. Use flash-kernel tp avoid fail platform detection
-sudo chroot $R rpi-update
 sudo chroot $R apt-get -y install libraspberrypi-bin libraspberrypi-dev \
 libraspberrypi-doc libraspberrypi0 raspberrypi-bootloader rpi-update
+sudo chroot $R rpi-update
 sudo chroot $R apt-get -y install linux-firmware linux-firmware-nonfree
 sudo chroot $R apt-get -y --no-install-recommends install linux-image-rpi2
 sudo chroot $R apt-get -y install flash-kernel
