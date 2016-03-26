@@ -54,14 +54,17 @@ echo INSTALL KERNEL. Use flash-kernel tp avoid fail platform detection
 sudo chroot $R apt-get -y install libraspberrypi-bin libraspberrypi-dev \
 libraspberrypi-doc libraspberrypi0 raspberrypi-bootloader rpi-update
 sudo chroot $R rpi-update
-sudo chroot $R apt-get -y install linux-firmware linux-firmware-nonfree
+sudo chroot $R apt-get -y install linux-firmware linux-firmware-nonfree fake-hwclock fbset i2c-tools rng-tools
 
-VMLINUZ="$(ls -1 $R/boot/vmlinuz-* | sort | tail -n 1)"
-[ -z "$VMLINUZ" ] && exit 1
-sudo cp $VMLINUZ $R/boot/firmware/kernel7.img
-INITRD="$(ls -1 $R/boot/initrd.img-* | sort | tail -n 1)"
-[ -z "$INITRD" ] && exit 1
-sudo cp $INITRD $R/boot/firmware/initrd7.img
+# VMLINUZ="$(ls -1 $R/boot/vmlinuz-* | sort | tail -n 1)"
+# [ -z "$VMLINUZ" ] && exit 1
+# sudo cp $VMLINUZ $R/boot/firmware/kernel7.img
+# INITRD="$(ls -1 $R/boot/initrd.img-* | sort | tail -n 1)"
+# [ -z "$INITRD" ] && exit 1
+# sudo cp $INITRD $R/boot/firmware/initrd7.img
+
+echo SETUP UDEV
+sudo chroot $R ./setUdev.sh
 
 echo SETUP FSTAB
 sudo chroot $R ./setFstab.sh
@@ -80,17 +83,18 @@ sudo chroot $R apt-get -y autoremove
 echo SETUP INTERFACES
 sudo chroot $R ./setInterfaces.sh
 
-echo SETUP FIRMWARE CONFIG FOR THE PI
-sudo chroot $R ./setFirmware.sh
-
-sudo ln -sf firmware/config.txt $R/boot/config.txt
-sudo ln -sf firmware/cmdline.txt $R/boot/cmdline.txt
-
 echo ENABLE SOUND ON BOOT
 sudo chroot $R ./setSound.sh
 
 echo DISABLE MODUES NOT APPLICABLE ON THE PI2
 sudo chroot $R ./setBlacklist.sh
+
+echo SETUP FIRMWARE CONFIG FOR THE PI
+sudo chroot $R ./setFirmware.sh
+
+sudo ln -sf firmware/config.txt $R/boot/config.txt
+sudo ln -sf firmware/cmdline.txt $R/boot/cmdline.txt
+sudo  chroot $R fake-hwclock save
 
 echo UNMOUNT FILESYSTEMS
 sudo chroot $R umount -l proc

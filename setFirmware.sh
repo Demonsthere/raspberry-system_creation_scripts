@@ -50,4 +50,5 @@ over_voltage=2
 gpu_mem=320
 EOF
 
-echo 'dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootwait' > boot/firmware/cmdline.txt
+#echo 'dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootwait' > boot/firmware/cmdline.txt
+echo "net.ifnames=0 biosdevname=0 dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait quiet splash" > boot/firmware/cmdline.txt
