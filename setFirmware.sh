@@ -2,7 +2,7 @@
 
 apt-add-repository -y ppa:ubuntu-pi-flavour-makers/ppa
 apt-get update
-apt-get -y install gdebi-core
+apt-get -y install gdebi-core wget
 COFI="http://archive.raspberrypi.org/debian/pool/main/r/raspi-copies-and-fills/raspi-copies-and-fills_0.5-1_armhf.deb"
 
 # Firmware Kernel installation
