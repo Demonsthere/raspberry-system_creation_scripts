@@ -82,6 +82,5 @@ sed -i 's/#sdram_freq=400/sdram_freq=500/' boot/config.txt
 sed -i 's/#over_voltage=0/over_voltage=2/' boot/config.txt
 sed -i 's/#gpu_mem=128/sdram_freq=256/' boot/config.txt
 
-
 # Save the clock
-chroot $R fake-hwclock save
+fake-hwclock save
