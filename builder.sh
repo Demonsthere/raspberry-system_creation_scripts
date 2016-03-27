@@ -120,14 +120,14 @@ function build_image() {
   DATE="$(date +%Y-%m-%d)"
   dd if=/dev/zero of="$BASEDIR/${DATE}-ubuntu-${RELEASE}.img" bs=1M count=1
   dd if=/dev/zero of="$BASEDIR/${DATE}-ubuntu-${RELEASE}.img" bs=1M count=0 seek=1792
-  sfdisk -f "$BASEDIR/${DATE}-ubuntu-${RELEASE}.img" << EOF
-  unit: sectors
+  sfdisk -f "$BASEDIR/${DATE}-ubuntu-${RELEASE}.img" <<EOF
+unit: sectors
 
-  1 : start=     2048, size=   131072, Id= c, bootable
-  2 : start=   133120, size=  3536896, Id=83
-  3 : start=        0, size=        0, Id= 0
-  4 : start=        0, size=        0, Id= 0
-  EOF
+1 : start=     2048, size=   131072, Id= c, bootable
+2 : start=   133120, size=  3536896, Id=83
+3 : start=        0, size=        0, Id= 0
+4 : start=        0, size=        0, Id= 0
+EOF
 
   VFAT_LOOP="$(losetup -o 1M --sizelimit 64M -f --show $BASEDIR/${DATE}-ubuntu-${RELEASE}.img)"
   EXT4_LOOP="$(losetup -o 65M --sizelimit 1727M -f --show $BASEDIR/${DATE}-ubuntu-${RELEASE}.img)"
