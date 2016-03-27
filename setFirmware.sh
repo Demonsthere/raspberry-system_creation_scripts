@@ -72,7 +72,7 @@ EOF
 
 # Set up firmware config
 wget -c https://raw.githubusercontent.com/Evilpaul/RPi-config/master/config.txt -O boot/config.txt
-echo "net.ifnames=0 biosdevname=0 dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=${FS} elevator=deadline rootwait quiet splash" > boot/cmdline.txt
+echo "net.ifnames=0 biosdevname=0 dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait quiet splash" > boot/cmdline.txt
 sed -i 's/#framebuffer_depth=16/framebuffer_depth=32/' boot/config.txt
 sed -i 's/#framebuffer_ignore_alpha=0/framebuffer_ignore_alpha=1/' boot/config.txt
 sed -i 's/#arm_freq=700/arm_freq=1000/' boot/config.txt
