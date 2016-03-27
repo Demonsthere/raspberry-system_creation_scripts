@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-echo SET FOLDER STRUCTURE
+echo '----> Set folder structure'
 BASEDIR=$(pwd)
 BUILDDIR=${BASEDIR}/build
 export TZ='Europe/Warsaw'
@@ -152,7 +152,6 @@ function stage_03_raspi2() {
   clean_up
   umount_system
   build_image
-  make_raspi2_image ${FS_TYPE} ${FS_SIZE}
 }
 
 stage_01_base

@@ -1,7 +1,9 @@
 #!/bin/bash -x
 
+apt-add-repository -y ppa:ubuntu-pi-flavour-makers/ppa
+apt-get update
 apt-get -y install gdebi-core
-local COFI="http://archive.raspberrypi.org/debian/pool/main/r/raspi-copies-and-fills/raspi-copies-and-fills_0.5-1_armhf.deb"
+COFI="http://archive.raspberrypi.org/debian/pool/main/r/raspi-copies-and-fills/raspi-copies-and-fills_0.5-1_armhf.deb"
 
 # Firmware Kernel installation
 apt-get -y install libraspberrypi-bin libraspberrypi-dev libraspberrypi-doc libraspberrypi0 raspberrypi-bootloader rpi-update
