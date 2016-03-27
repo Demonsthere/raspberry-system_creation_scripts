@@ -23,13 +23,6 @@ sudo mount -o rw,exec,users -t sysfs mone $R/sys
 echo SET SOURCES
 sudo chroot $R ./setSources.sh $RELEASE
 
-echo SET LOCALES
-for LOCALE in $(sudo chroot $R locale | cut -d'=' -f2 | grep -v : | sed 's/"//g' | uniq); do
-  if [ -n "${LOCALE}" ]; then
-    sudo chroot $R locale-gen $LOCALE
-  fi
-done
-
 echo TRICK DUMMY SYSTEM TO UPGRADE
 sudo chroot $R apt-get update
 sudo chroot $R apt-get -fuy -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --force-yes dist-upgrade
@@ -38,33 +31,26 @@ echo INSTALL RPi PPA
 sudo chroot $R ./setPPA.sh
 
 sudo chroot $R apt-get -y install software-properties-common ubuntu-keyring
-#sudo chroot $R apt-add-repository -y ppa:fo0bar/rpi2 raspberrypi-bootloader-nokernel rpi2-ubuntu-errata
-sudo chroot $R apt-add-repository -y ppa:ubuntu-pi-flavour-makers/ppa
+sudo chroot $R apt-add-repository -y ppa:fo0bar/rpi2
 sudo chroot $R apt-get update
 
 echo INSTALL STANDARD PACKAGES 
 sudo chroot $R apt-get -fuy -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --force-yes \
-install f2fs-tools software-properties-common ubuntu-standard apt-utils initramfs-tools \
-language-pack-en openssh-server language-pack-pl
+	install ubuntu-minimal apt-utils ubuntu-standard initramfs-tools raspberrypi-bootloader-nokernel \
+    rpi2-ubuntu-errata language-pack-en openssh-server language-pack-pl
 
-#echo  INSTALL MINIMALL DESKTOP
-#sudo chroot $R apt-get install -fuy --no-install-recommends lubuntu-core
+echo  INSTALL MINIMALL DESKTOP
+sudo chroot $R apt-get install -fuy --no-install-recommends lubuntu-core
 
 echo INSTALL KERNEL. Use flash-kernel tp avoid fail platform detection
-sudo chroot $R apt-get -y install libraspberrypi-bin libraspberrypi-dev \
-libraspberrypi-doc libraspberrypi0 raspberrypi-bootloader rpi-update
-sudo chroot $R rpi-update
-sudo chroot $R apt-get -y install linux-firmware linux-firmware-nonfree fake-hwclock fbset i2c-tools rng-tools
-
-# VMLINUZ="$(ls -1 $R/boot/vmlinuz-* | sort | tail -n 1)"
-# [ -z "$VMLINUZ" ] && exit 1
-# sudo cp $VMLINUZ $R/boot/firmware/kernel7.img
-# INITRD="$(ls -1 $R/boot/initrd.img-* | sort | tail -n 1)"
-# [ -z "$INITRD" ] && exit 1
-# sudo cp $INITRD $R/boot/firmware/initrd7.img
-
-echo SETUP UDEV
-sudo chroot $R ./setUdev.sh
+sudo chroot $R apt-get -y --no-install-recommends install linux-image-rpi2
+sudo chroot $R apt-get -y install flash-kernel
+VMLINUZ="$(ls -1 $R/boot/vmlinuz-* | sort | tail -n 1)"
+[ -z "$VMLINUZ" ] && exit 1
+sudo cp $VMLINUZ $R/boot/firmware/kernel7.img
+INITRD="$(ls -1 $R/boot/initrd.img-* | sort | tail -n 1)"
+[ -z "$INITRD" ] && exit 1
+sudo cp $INITRD $R/boot/firmware/initrd7.img
 
 echo SETUP FSTAB
 sudo chroot $R ./setFstab.sh
@@ -72,9 +58,14 @@ sudo chroot $R ./setFstab.sh
 echo SETUP HOST
 sudo chroot $R ./setHost.sh
 
-echo CREATE UBUNTU USER
-sudo chroot $R adduser --gecos "RPiBbuntu user" --add_extra_groups --disabled-password ubuntu
-sudo chroot $R usermod -a -G sudo,adm -p '$6$iTPEdlv4$HSmYhiw2FmvQfueq32X30NqsYKpGDoTAUV2mzmHEgP/1B7rV3vfsjZKnAWn6M2d.V2UsPuZ2nWHg1iqzIu/nF/' ubuntu
+echo CREATE HYBRIS USER
+sudo chroot $R adduser --gecos "RPiBbuntu user" --add_extra_groups --disabled-password hybris
+sudo chroot $R usermod -a -G sudo,adm -p '$6$iTPEdlv4$HSmYhiw2FmvQfueq32X30NqsYKpGDoTAUV2mzmHEgP/1B7rV3vfsjZKnAWn6M2d.V2UsPuZ2nWHg1iqzIu/nF/' hybris
+sudo chroot $R bin/bash -c 'echo "hybris:hybris" | chpasswd'
+
+echo SYSTEM CLEANUP
+sudo chroot $R apt-get autoclean
+sudo chroot $R apt-get -y autoremove
 
 echo SETUP INTERFACES
 sudo chroot $R ./setInterfaces.sh
@@ -82,25 +73,23 @@ sudo chroot $R ./setInterfaces.sh
 echo SETUP FIRMWARE CONFIG FOR THE PI
 sudo chroot $R ./setFirmware.sh
 
+sudo ln -sf firmware/config.txt $R/boot/config.txt
+sudo ln -sf firmware/cmdline.txt $R/boot/cmdline.txt
+
 echo ENABLE SOUND ON BOOT
 sudo chroot $R ./setSound.sh
 
 echo DISABLE MODUES NOT APPLICABLE ON THE PI2
 sudo chroot $R ./setBlacklist.sh
 
-sudo ln -sf firmware/config.txt $R/boot/config.txt
-sudo ln -sf firmware/cmdline.txt $R/boot/cmdline.txt
-sudo  chroot $R fake-hwclock save
-
-echo SYSTEM CLEANUP
-sudo chroot $R apt-get autoclean
-sudo chroot $R apt-get -y autoremove
-
 echo UNMOUNT FILESYSTEMS
 sudo chroot $R umount -l proc
 sudo chroot $R umount -l sys
 
+
 echo CLEANUP FILES
+sudo chroot $R ./cleanUp.sh
+sudo .$R/isMouned.sh
 sudo chroot $R ./cleanUp.sh
 
 echo BUILD BASE IMAGE 1.75GiB
@@ -130,3 +119,7 @@ sudo umount "$MOUNTDIR/boot/firmware"
 sudo umount "$MOUNTDIR"
 sudo losetup -d "$EXT4_LOOP"
 sudo losetup -d "$VFAT_LOOP"
+
+echo ZIP AND SEND TO SERVER
+zip -j PiBuntu-base.zip $BASEDIR/*-ubuntu-*.img
+scp PiBuntu-base.zip jblaszczyk@vagrantimages.yrdci.fra.hybris.com:/var/www/

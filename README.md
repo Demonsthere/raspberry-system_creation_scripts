@@ -1,4 +1,4 @@
-# Raspberry-system_creation_scripts
+# Raspberrypi-Ubuntu
 
 Set of scripts used to create the RPiBuntu (custom Ubuntu for RPi) OS used in the building plan. The script are speerated, as they are called by the new root of chroot and need to be separated from the jenkins userspace
 
@@ -20,7 +20,7 @@ The very operation of this script can be shown as a sequential list of operation
 2.	Run Qemu-debootstrap to download the system skeleton (the --arch armfh flag will trigger the download for the armhf platform)
 3.	Copy the Qemu-user-static binary form armhf to the skeleton (This will enable the use of chroot within the system with a different CPU)
 4.	Mount additional, empty drives to the skeleton (/proc and /sys)
-5.  Commands bellow are done in the new system with the help of chroot !
+5. ! Commands bellow are done in the new system with the help of chroot !
 5.	Set /etc/apt/souces.list (! Setting is files is only possible with scipts or wrappers as the chroot will take 1 argument for the command)
 6.	Update/Upgrade the skeleton to download missing base packages
 7.	Set PPa for Raspberry Drivers
