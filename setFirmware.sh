@@ -1,54 +1,85 @@
 #!/bin/bash -x
 
-cat <<EOF > boot/firmware/config.txt
-# For more options and information see 
-# http://www.raspberrypi.org/documentation/configuration/config-txt.md
-# Some settings may impact device functionality. See link above for details
+apt-get -y install gdebi-core
+local COFI="http://archive.raspberrypi.org/debian/pool/main/r/raspi-copies-and-fills/raspi-copies-and-fills_0.5-1_armhf.deb"
 
-# uncomment if you get no picture on HDMI for a default "safe" mode
-#hdmi_safe=1
+# Firmware Kernel installation
+apt-get -y install libraspberrypi-bin libraspberrypi-dev libraspberrypi-doc libraspberrypi0 raspberrypi-bootloader rpi-update
+apt-get -y install linux-firmware linux-firmware-nonfree
 
-# uncomment this if your display has a black border of unused pixels visible
-# and your display can output without overscan
-#disable_overscan=1
+rpi-update
 
-# uncomment the following to adjust overscan. Use positive numbers if console
-# goes off screen, and negative if there is too much border
-#overscan_left=16
-#overscan_right=16
-#overscan_top=16
-#overscan_bottom=16
+# Add VideoCore libs to ld.so
+echo "/opt/vc/lib" > etc/ld.so.conf.d/vmcs.conf
 
-# uncomment to force a console size. By default it will be display's size minus
-# overscan.
-#framebuffer_width=1280
-#framebuffer_height=720
-
-# uncomment if hdmi display is not detected and composite is being output
-#hdmi_force_hotplug=1
-
-# uncomment to force a specific HDMI mode (this will force VGA)
-#hdmi_group=1
-#hdmi_mode=1
-
-# uncomment to force a HDMI mode rather than DVI. This can make audio work in
-# DMT (computer monitor) modes
-#hdmi_drive=2
-
-# uncomment to increase signal to HDMI, if you have interference, blanking, or
-# no display
-#config_hdmi_boost=4
-
-# uncomment for composite PAL
-#sdtv_mode=2
-
-#uncomment to overclock the arm. 700 MHz is the default.
-arm_freq=1000
-sdram_freq=500
-core_freq=500
-over_voltage=2
-gpu_mem=320
+apt-get -y install xserver-xorg-video-fbturbo
+cat << EOF > etc/X11/xorg.conf
+Section "Device"
+    Identifier "Raspberry Pi FBDEV"
+    Driver "fbturbo"
+    Option "fbdev" "/dev/fb0"
+    Option "SwapbuffersWait" "true"
+EndSection
 EOF
 
-#echo 'dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootwait' > boot/firmware/cmdline.txt
-echo "net.ifnames=0 biosdevname=0 dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait quiet splash" > boot/firmware/cmdline.txt
+# Hardware - Create a fake HW clock and add rng-tools
+apt-get -y install fake-hwclock fbset i2c-tools rng-tools
+
+# Load sound module on boot and enable HW random number generator
+cat << EOF > etc/modules-load.d/rpi2.conf
+snd_bcm2835
+bcm2708_rng
+EOF
+
+# Blacklist platform modules not applicable to the RPi2
+cat << EOF > etc/modprobe.d/blacklist-rpi2.conf
+blacklist snd_soc_pcm512x_i2c
+blacklist snd_soc_pcm512x
+blacklist snd_soc_tas5713
+blacklist snd_soc_wm8804
+EOF
+
+# Disable TLP
+if [ -f etc/default/tlp ]; then
+  sed -i s'/TLP_ENABLE=1/TLP_ENABLE=0/' $R/etc/default/tlp
+fi
+
+# udev rules
+printf 'SUBSYSTEM=="vchiq", GROUP="video", MODE="0660"\n' > etc/udev/rules.d/10-local-rpi.rules
+printf "SUBSYSTEM==\"gpio*\", PROGRAM=\"/bin/sh -c 'chown -R root:gpio /sys/class/gpio && chmod -R 770 /sys/class/gpio; chown -R root:gpio /sys/devices/virtual/gpio && chmod -R 770 /sys/devices/virtual/gpio'\"\n" > etc/udev/rules.d/99-com.rules
+printf 'SUBSYSTEM=="input", GROUP="input", MODE="0660"\n' >> etc/udev/rules.d/99-com.rules
+printf 'SUBSYSTEM=="i2c-dev", GROUP="i2c", MODE="0660"\n' >> etc/udev/rules.d/99-com.rules
+printf 'SUBSYSTEM=="spidev", GROUP="spi", MODE="0660"\n' >> etc/udev/rules.d/99-com.rules
+
+cat << EOF > etc/udev/rules.d/40-scratch.rules
+ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0003", SUBSYSTEMS=="usb", ACTION=="add", MODE="0666", GROUP="plugdev"
+EOF
+
+# copies-and-fills
+wget -c "${COFI}" -O tmp/cofi.deb
+gdebi -n /tmp/cofi.deb
+# Disabled cofi so it doesn't segfault when building via qemu-user-static
+mv -v etc/ld.so.preload etc/ld.so.preload.disable
+
+# Set up fstab
+cat << EOF > etc/fstab
+proc            /proc           proc    defaults          0       0
+/dev/mmcblk0p2  /               ext4    defaults,noatime  0       1
+/dev/mmcblk0p1  /boot/          vfat    defaults          0       2
+EOF
+
+# Set up firmware config
+wget -c https://raw.githubusercontent.com/Evilpaul/RPi-config/master/config.txt -O boot/config.txt
+echo "net.ifnames=0 biosdevname=0 dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=${FS} elevator=deadline rootwait quiet splash" > boot/cmdline.txt
+sed -i 's/#framebuffer_depth=16/framebuffer_depth=32/' boot/config.txt
+sed -i 's/#framebuffer_ignore_alpha=0/framebuffer_ignore_alpha=1/' boot/config.txt
+sed -i 's/#arm_freq=700/arm_freq=1000/' boot/config.txt
+sed -i 's/#sdram_freq=400/sdram_freq=500/' boot/config.txt
+sed -i 's/#core_freq=250/core_freq=500/' boot/config.txt
+sed -i 's/#sdram_freq=400/sdram_freq=500/' boot/config.txt
+sed -i 's/#over_voltage=0/over_voltage=2/' boot/config.txt
+sed -i 's/#gpu_mem=128/sdram_freq=256/' boot/config.txt
+
+
+# Save the clock
+chroot $R fake-hwclock save
