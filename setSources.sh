@@ -1,6 +1,6 @@
 #!/bin/bash -x
 RELEASE=$1
-cat << EOF > etc/apt/sources.list
+cat <<EOF > etc/apt/sources.list
 deb http://ports.ubuntu.com/ ${RELEASE} main restricted universe multiverse
 # deb-src http://ports.ubuntu.com/ ${RELEASE} main restricted universe multiverse
 

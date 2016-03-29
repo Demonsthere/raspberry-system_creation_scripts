@@ -17,6 +17,9 @@ function bootstrap() {
 
 function mount_system() {
   echo '----> Mounting empty filesystems to populate'
+  if [ -e $R/etc/ld.so.preload ]; then
+    mv -v $R/etc/ld.so.preload $R/etc/ld.so.preload.disable
+  fi
   mount -t proc none $R/proc
   mount -t sysfs none $R/sys
   mount -o bind /dev $R/dev
@@ -119,18 +122,18 @@ function build_image() {
   echo '----> Building image'
   DATE="$(date +%Y-%m-%d)"
   dd if=/dev/zero of="$BASEDIR/${DATE}-ubuntu-${RELEASE}.img" bs=1M count=1
-  dd if=/dev/zero of="$BASEDIR/${DATE}-ubuntu-${RELEASE}.img" bs=1M count=0 seek=1792
+  dd if=/dev/zero of="$BASEDIR/${DATE}-ubuntu-${RELEASE}.img" bs=1M count=0 seek=3750
   sfdisk -f "$BASEDIR/${DATE}-ubuntu-${RELEASE}.img" <<EOF
 unit: sectors
 
 1 : start=     2048, size=   131072, Id= c, bootable
-2 : start=   133120, size=  3536896, Id=83
+2 : start=   133120, size=  7546880, Id=83
 3 : start=        0, size=        0, Id= 0
 4 : start=        0, size=        0, Id= 0
 EOF
 
   VFAT_LOOP="$(losetup -o 1M --sizelimit 64M -f --show $BASEDIR/${DATE}-ubuntu-${RELEASE}.img)"
-  EXT4_LOOP="$(losetup -o 65M --sizelimit 1727M -f --show $BASEDIR/${DATE}-ubuntu-${RELEASE}.img)"
+  EXT4_LOOP="$(losetup -o 65M --sizelimit 3685M -f --show $BASEDIR/${DATE}-ubuntu-${RELEASE}.img)"
   mkfs.vfat -n PI_BOOT -S 512 -s 16 -v "$VFAT_LOOP"
   mkfs.ext4 -L PI_ROOT -m 0 "$EXT4_LOOP"
   MOUNTDIR="$BUILDDIR/mount"

@@ -6,6 +6,6 @@ printf 'SUBSYSTEM=="input", GROUP="input", MODE="0660"\n' >> etc/udev/rules.d/99
 printf 'SUBSYSTEM=="i2c-dev", GROUP="i2c", MODE="0660"\n' >> etc/udev/rules.d/99-com.rules
 printf 'SUBSYSTEM=="spidev", GROUP="spi", MODE="0660"\n' >> etc/udev/rules.d/99-com.rules
 
-cat << EOF > etc/udev/rules.d/40-scratch.rules
+cat <<EOF > etc/udev/rules.d/40-scratch.rules
 ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0003", SUBSYSTEMS=="usb", ACTION=="add", MODE="0666", GROUP="plugdev"
 EOF

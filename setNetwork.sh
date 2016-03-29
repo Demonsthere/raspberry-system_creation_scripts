@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-cat << EOF > etc/network/interfaces
+cat <<EOF > etc/network/interfaces
 # interfaces(5) file used by ifup(8) and ifdown(8)
 # Include files from /etc/network/interfaces.d:
 source-directory /etc/network/interfaces.d
@@ -16,7 +16,7 @@ EOF
 
 echo "nameserver 8.8.8.8" > etc/resolv.conf
 
-cat << EOF > etc/hosts
+cat <<EOF > etc/hosts
 127.0.0.1       localhost
 ::1             localhost ip6-localhost ip6-loopback
 ff02::1         ip6-allnodes

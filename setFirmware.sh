@@ -15,7 +15,7 @@ rpi-update
 echo "/opt/vc/lib" > etc/ld.so.conf.d/vmcs.conf
 
 apt-get -y install xserver-xorg-video-fbturbo
-cat << EOF > etc/X11/xorg.conf
+cat <<EOF > etc/X11/xorg.conf
 Section "Device"
     Identifier "Raspberry Pi FBDEV"
     Driver "fbturbo"
@@ -28,13 +28,13 @@ EOF
 apt-get -y install fake-hwclock fbset i2c-tools rng-tools
 
 # Load sound module on boot and enable HW random number generator
-cat << EOF > etc/modules-load.d/rpi2.conf
+cat <<EOF > etc/modules-load.d/rpi2.conf
 snd_bcm2835
 bcm2708_rng
 EOF
 
 # Blacklist platform modules not applicable to the RPi2
-cat << EOF > etc/modprobe.d/blacklist-rpi2.conf
+cat <<EOF > etc/modprobe.d/blacklist-rpi2.conf
 blacklist snd_soc_pcm512x_i2c
 blacklist snd_soc_pcm512x
 blacklist snd_soc_tas5713
@@ -53,7 +53,7 @@ printf 'SUBSYSTEM=="input", GROUP="input", MODE="0660"\n' >> etc/udev/rules.d/99
 printf 'SUBSYSTEM=="i2c-dev", GROUP="i2c", MODE="0660"\n' >> etc/udev/rules.d/99-com.rules
 printf 'SUBSYSTEM=="spidev", GROUP="spi", MODE="0660"\n' >> etc/udev/rules.d/99-com.rules
 
-cat << EOF > etc/udev/rules.d/40-scratch.rules
+cat <<EOF > etc/udev/rules.d/40-scratch.rules
 ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0003", SUBSYSTEMS=="usb", ACTION=="add", MODE="0666", GROUP="plugdev"
 EOF
 
@@ -64,7 +64,7 @@ gdebi -n /tmp/cofi.deb
 mv -v etc/ld.so.preload etc/ld.so.preload.disable
 
 # Set up fstab
-cat << EOF > etc/fstab
+cat <<EOF > etc/fstab
 proc            /proc           proc    defaults          0       0
 /dev/mmcblk0p2  /               ext4    defaults,noatime  0       1
 /dev/mmcblk0p1  /boot/          vfat    defaults          0       2
@@ -72,7 +72,8 @@ EOF
 
 # Set up firmware config
 wget -c https://raw.githubusercontent.com/Evilpaul/RPi-config/master/config.txt -O boot/config.txt
-echo "net.ifnames=0 biosdevname=0 dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait quiet splash" > boot/cmdline.txt
+#echo "net.ifnames=0 biosdevname=0 dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait quiet splash" > boot/cmdline.txt
+echo "dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootwait" > boot/cmdline.txt
 sed -i 's/#framebuffer_depth=16/framebuffer_depth=32/' boot/config.txt
 sed -i 's/#framebuffer_ignore_alpha=0/framebuffer_ignore_alpha=1/' boot/config.txt
 sed -i 's/#arm_freq=700/arm_freq=1000/' boot/config.txt
