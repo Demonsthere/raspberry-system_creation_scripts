@@ -141,7 +141,7 @@ EOF
   mount "$EXT4_LOOP" "$MOUNTDIR"
   mkdir -p "$MOUNTDIR/boot"
   mount "$VFAT_LOOP" "$MOUNTDIR/boot"
-  rsync -a --progress "$R/" "$MOUNTDIR/"
+  rsync -a "$R/" "$MOUNTDIR/"
   umount "$MOUNTDIR/boot"
   umount "$MOUNTDIR"
   losetup -d "$EXT4_LOOP"
