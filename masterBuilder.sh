@@ -101,8 +101,6 @@ chroot $R umount -l sys
 
 echo '----> CLEANUP FILES'
 chroot $R ./cleanUp.sh
-.$R/isMouned.sh
-chroot $R ./cleanUp.sh
 
 echo '----> BUILD BASE IMAGE 1.75GiB'
 DATE="$(date +%Y-%m-%d)"
