@@ -43,7 +43,7 @@ chroot $R apt-get update
 echo '----> INSTALL STANDARD PACKAGES'
 chroot $R apt-get -fuy -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --force-yes \
 	install ubuntu-minimal apt-utils initramfs-tools raspberrypi-bootloader-nokernel \
-    rpi2-ubuntu-errata language-pack-en openssh-server language-pack-pl
+    rpi2-ubuntu-errata language-pack-en openssh-server language-pack-pl curl wget
 
 echo  '----> INSTALL XSERVER LIBRARIES'
 chroot $R apt-get install -fuy xserver-xorg-video-fbturbo
